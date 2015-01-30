@@ -76,15 +76,16 @@ ngx_http_postpone_filter(ngx_http_request_t *r, ngx_chain_t *in)
         return NGX_OK;
     }
     
+    //如果原始请求r没有子请求产生的响应需要转发
     if (r->postponed == NULL) {
-
+        //直接调用下一个过滤模块处理in包体。如果没有错误的话，就会开始向下游客户端发送响应
         if (in || c->buffered) {
             return ngx_http_next_body_filter(r->main, in);
         }
 
         return NGX_OK;
     }
-
+    //如果能走到这，说明postponed链表中是有子请求产生的响应需要转发的，可以先把in包体加到待转发响应的末尾
     if (in) {
         ngx_http_postpone_filter_add(r, in);
     }
