@@ -2226,7 +2226,7 @@ ngx_http_run_posted_requests(ngx_connection_t *c)
     }
 }
 
-
+//将子请求r加到原始请求的posted_requests中
 ngx_int_t
 ngx_http_post_request(ngx_http_request_t *r, ngx_http_posted_request_t *pr)
 {

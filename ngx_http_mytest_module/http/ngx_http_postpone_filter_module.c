@@ -48,20 +48,21 @@ ngx_module_t  ngx_http_postpone_filter_module = {
 
 static ngx_http_output_body_filter_pt    ngx_http_next_body_filter;
 
-
+//参数in表示将要发送给客户端的一段包体
 static ngx_int_t
 ngx_http_postpone_filter(ngx_http_request_t *r, ngx_chain_t *in)
 {
     ngx_connection_t              *c;
     ngx_http_postponed_request_t  *pr;
 
+    //c是Nginx与下游客户端间的连接，c->data保存的是原始请求
     c = r->connection;
 
     ngx_log_debug3(NGX_LOG_DEBUG_HTTP, c->log, 0,
                    "http postpone filter \"%V?%V\" %p", &r->uri, &r->args, in);
     //如果当前请求r是子请求
     if (r != c->data) {
-
+        //如果发送的in包体不为空，则把in加到这个子请求的postponed链表的最后，同时返回NGX_OK，这意味着本次不会把in包体发送给客户端
         if (in) {
             ngx_http_postpone_filter_add(r, in);
             return NGX_OK;
@@ -89,10 +90,10 @@ ngx_http_postpone_filter(ngx_http_request_t *r, ngx_chain_t *in)
     if (in) {
         ngx_http_postpone_filter_add(r, in);
     }
-
+    //循环处理postponed链表中所有子请求待转发的包体
     do {
         pr = r->postponed;
-
+        //如果pr->request存在，即子请求存在，那么说明这个子请求还没有完成，将其加入到原始请求的posted_requests队列中，等待HTTP框架来处理这个子请求
         if (pr->request) {
 
             ngx_log_debug2(NGX_LOG_DEBUG_HTTP, c->log, 0,
@@ -114,7 +115,7 @@ ngx_http_postpone_filter(ngx_http_request_t *r, ngx_chain_t *in)
             ngx_log_debug2(NGX_LOG_DEBUG_HTTP, c->log, 0,
                            "http postpone filter output \"%V?%V\"",
                            &r->uri, &r->args);
-
+            //调用HTTP的下一个过滤模块来转发out链表中保存的待转发的包体
             if (ngx_http_next_body_filter(r->main, pr->out) == NGX_ERROR) {
                 return NGX_ERROR;
             }

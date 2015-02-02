@@ -47,7 +47,7 @@ ngx_module_t  ngx_http_not_modified_filter_module = {
     NGX_MODULE_V1_PADDING
 };
 
-
+//定义为static类型可以使得ngx_http_next_header_filter变量仅在当前源文件中生效，这就允许所有的http过滤模块都有各自的ngx_http_next_header_flater指针，这样，在每个http过滤模块初始化时，就可以用这个指针指向下一个http过滤模块了
 static ngx_http_output_header_filter_pt  ngx_http_next_header_filter;
 
 
@@ -233,7 +233,9 @@ ngx_http_test_if_match(ngx_http_request_t *r, ngx_table_elt_t *header)
 static ngx_int_t
 ngx_http_not_modified_filter_init(ngx_conf_t *cf)
 {
+    //ngx_http_next_header_filter指针指向链表中原来的首部,这样，在此文件中调用ngx_http_next_header_filter(r)就可以直接调用下一个过滤模块了
     ngx_http_next_header_filter = ngx_http_top_header_filter;
+    //将当前过滤模块设为链表的首部
     ngx_http_top_header_filter = ngx_http_not_modified_header_filter;
 
     return NGX_OK;
