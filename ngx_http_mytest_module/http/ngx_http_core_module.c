@@ -807,7 +807,7 @@ static ngx_http_module_t  ngx_http_core_module_ctx = {
     ngx_http_core_merge_loc_conf           /* merge location configuration */
 };
 
-
+//此模块的用途：业务的核心逻辑以及对于具体的请求该选用哪一个http模块处理这样的工作,看一下它的commands就知道他的作用了
 ngx_module_t  ngx_http_core_module = {
     NGX_MODULE_V1,
     &ngx_http_core_module_ctx,             /* module context */

@@ -138,8 +138,8 @@ struct ngx_module_s {
 
 typedef struct {
     ngx_str_t             name;
-    void               *(*create_conf)(ngx_cycle_t *cycle);
-    char               *(*init_conf)(ngx_cycle_t *cycle, void *conf);
+    void               *(*create_conf)(ngx_cycle_t *cycle); //解析配置项前，Nginx框架会调用这个方法
+    char               *(*init_conf)(ngx_cycle_t *cycle, void *conf);   //解析配置项完成后，Nginx框架会调用这个方法
 } ngx_core_module_t;
 
 

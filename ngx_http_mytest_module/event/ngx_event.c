@@ -181,7 +181,7 @@ ngx_event_module_t  ngx_event_core_module_ctx = {
     { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL }
 };
 
-
+//事件处理模块的核心,看一下它的commands数组
 ngx_module_t  ngx_event_core_module = {
     NGX_MODULE_V1,
     &ngx_event_core_module_ctx,            /* module context */
