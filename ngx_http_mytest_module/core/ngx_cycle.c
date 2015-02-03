@@ -35,7 +35,7 @@ ngx_tls_key_t          ngx_core_tls_key;
 static ngx_connection_t  dumb;
 /* STUB */
 
-
+//有了配置文件，Nginx框架就开始根据配置项来加载所有的模块了，这一步骤就在此方法中进行,从函数名字就知道，它是用来构造ngx_cycle_t结构体中成员的
 ngx_cycle_t *
 ngx_init_cycle(ngx_cycle_t *old_cycle)
 {
