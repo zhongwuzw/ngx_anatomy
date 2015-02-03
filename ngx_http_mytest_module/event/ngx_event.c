@@ -197,7 +197,7 @@ ngx_module_t  ngx_event_core_module = {
     NGX_MODULE_V1_PADDING
 };
 
-
+//该方法是事件模块的核心方法,它来处理事件
 void
 ngx_process_events_and_timers(ngx_cycle_t *cycle)
 {

@@ -78,7 +78,7 @@ static ngx_cycle_t      ngx_exit_cycle;
 static ngx_log_t        ngx_exit_log;
 static ngx_open_file_t  ngx_exit_log_file;
 
-
+//master进程执行该方法来处理master的任务，它包括一个无限循环
 void
 ngx_master_process_cycle(ngx_cycle_t *cycle)
 {
@@ -141,7 +141,7 @@ ngx_master_process_cycle(ngx_cycle_t *cycle)
     delay = 0;
     sigio = 0;
     live = 1;
-
+    //这个for循环看似不停的执行，其实会通过过sigsuspend调度使master进程休眠，等待master进程收到信号后激活master进程继续执行循环
     for ( ;; ) {
         if (delay) {
             if (ngx_sigalrm) {
@@ -726,7 +726,7 @@ ngx_master_process_exit(ngx_cycle_t *cycle)
     exit(0);
 }
 
-
+//worker进程工作循环
 static void
 ngx_worker_process_cycle(ngx_cycle_t *cycle, void *data)
 {
@@ -788,7 +788,7 @@ ngx_worker_process_cycle(ngx_cycle_t *cycle, void *data)
 #endif
 
     for ( ;; ) {
-
+        //ngx_terminate、ngx_quit、ngx_reopen是master进程通过信号传过来的，worker会接收处理这些信号并设置如下的ngx_terminate等的值，而ngx_exiting是在下面的处理ngx_quit变量中设置的
         if (ngx_exiting) {
 
             c = cycle->connections;
@@ -802,11 +802,11 @@ ngx_worker_process_cycle(ngx_cycle_t *cycle, void *data)
                     c[i].read->handler(c[i].read);
                 }
             }
-
+            //该红黑树是保存所有事件的定时器,相等的条件是此红黑树为空
             if (ngx_event_timer_rbtree.root == ngx_event_timer_rbtree.sentinel)
             {
                 ngx_log_error(NGX_LOG_NOTICE, cycle->log, 0, "exiting");
-
+                //红黑树为空，退出进程
                 ngx_worker_process_exit(cycle);
             }
         }
@@ -969,7 +969,7 @@ ngx_worker_process_init(ngx_cycle_t *cycle, ngx_int_t worker)
     for (i = 0; i < cycle->listening.nelts; i++) {
         ls[i].previous = NULL;
     }
-
+    //不管三七二十一，先把模块加载进来
     for (i = 0; ngx_modules[i]; i++) {
         if (ngx_modules[i]->init_process) {
             if (ngx_modules[i]->init_process(cycle) == NGX_ERROR) {

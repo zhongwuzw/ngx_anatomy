@@ -30,10 +30,10 @@ int              ngx_argc;
 char           **ngx_argv;
 char           **ngx_os_argv;
 
-ngx_int_t        ngx_process_slot;
+ngx_int_t        ngx_process_slot;  //当前操作的进程在ngx_processes数组中的下标
 ngx_socket_t     ngx_channel;
 ngx_int_t        ngx_last_process;
-ngx_process_t    ngx_processes[NGX_MAX_PROCESSES];
+ngx_process_t    ngx_processes[NGX_MAX_PROCESSES];  //该数组用来管理子进程，只有master会使用这个结构
 
 
 ngx_signal_t  signals[] = {
@@ -82,7 +82,7 @@ ngx_signal_t  signals[] = {
     { 0, NULL, "", NULL }
 };
 
-
+//封装了fork方法来创建子进程
 ngx_pid_t
 ngx_spawn_process(ngx_cycle_t *cycle, ngx_spawn_proc_pt proc, void *data,
     char *name, ngx_int_t respawn)
@@ -95,6 +95,7 @@ ngx_spawn_process(ngx_cycle_t *cycle, ngx_spawn_proc_pt proc, void *data,
         s = respawn;
 
     } else {
+        //从ngx_processes数组中选择一个还未使用的ngx_process_t元素存储这个子进程的相关信息，如果所有1024个数组元素中没有已经空余的元素，也就是说，子进程个数超过了最大值1024，那么将返回NGX_INVALID_PID
         for (s = 0; s < ngx_last_process; s++) {
             if (ngx_processes[s].pid == -1) {
                 break;
