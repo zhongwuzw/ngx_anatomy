@@ -166,24 +166,24 @@ ngx_master_process_cycle(ngx_cycle_t *cycle)
 
         ngx_log_debug0(NGX_LOG_DEBUG_EVENT, cycle->log, 0, "sigsuspend");
 
-        sigsuspend(&set);
+        sigsuspend(&set);   //使master进程休眠来等待信号的到来
 
         ngx_time_update();
 
         ngx_log_debug1(NGX_LOG_DEBUG_EVENT, cycle->log, 0,
                        "wake up, sigio %i", sigio);
-
+        //有子进程以外结束，这时需要监控所有的子进程，也就是ngx_reap_children方法所做的工作
         if (ngx_reap) {
             ngx_reap = 0;
             ngx_log_debug0(NGX_LOG_DEBUG_EVENT, cycle->log, 0, "reap children");
 
             live = ngx_reap_children(cycle);
         }
-
+        //live为0表示所有子进程都已经退出
         if (!live && (ngx_terminate || ngx_quit)) {
             ngx_master_process_exit(cycle);
         }
-
+        //强制关闭整个服务
         if (ngx_terminate) {
             if (delay == 0) {
                 delay = 50;
@@ -205,7 +205,7 @@ ngx_master_process_cycle(ngx_cycle_t *cycle)
 
             continue;
         }
-
+        //优雅的关闭整个服务
         if (ngx_quit) {
             ngx_signal_worker_processes(cycle,
                                         ngx_signal_value(NGX_SHUTDOWN_SIGNAL));
@@ -222,7 +222,7 @@ ngx_master_process_cycle(ngx_cycle_t *cycle)
 
             continue;
         }
-
+        //重新读取配置文件并使服务对新配置项生效,Nginx不会再让原先的worker等子进程重新读取配置文件，它的策略是重新初始化ngx_cycle_t结构体，用它来读取新的配置文件，再拉起新的worker进程，销毁旧的worker进程
         if (ngx_reconfigure) {
             ngx_reconfigure = 0;
 
@@ -236,7 +236,7 @@ ngx_master_process_cycle(ngx_cycle_t *cycle)
             }
 
             ngx_log_error(NGX_LOG_NOTICE, cycle->log, 0, "reconfiguring");
-
+            //重新读取配置文件之前又重新创建了一个新的cycle
             cycle = ngx_init_cycle(cycle);
             if (cycle == NULL) {
                 cycle = (ngx_cycle_t *) ngx_cycle;
@@ -247,13 +247,15 @@ ngx_master_process_cycle(ngx_cycle_t *cycle)
             ccf = (ngx_core_conf_t *) ngx_get_conf(cycle->conf_ctx,
                                                    ngx_core_module);
             ngx_start_worker_processes(cycle, ccf->worker_processes,
-                                       NGX_PROCESS_JUST_RESPAWN);
+                                       NGX_PROCESS_JUST_RESPAWN);   //注意第三个参数，值不同此函数的意义就不同
             ngx_start_cache_manager_processes(cycle, 1);
 
             /* allow new processes to start */
             ngx_msleep(100);
 
             live = 1;
+            //向原先的（并非刚刚前面调用ngx_start_cache_manager_processes新生成的子进程）所有子进程发送QUIT信号，要求它们优雅地退出自己的进程
+            //这个ngx_signal_worker_processes函数是怎么判断是新生成的还是原来的呢？就是通过ngx_processes数组，它存的元素是ngx_process_t，它有一个成员叫just_spawn，它为1时表示是新生成的子进程，这样ngx_signal_worker_processes在向子进程发送kill信号之前先判断是否just_spawn为1.just_spawn在ngx_start_worker_processes方法中会为新创建的子进程的该属性设置为1
             ngx_signal_worker_processes(cycle,
                                         ngx_signal_value(NGX_SHUTDOWN_SIGNAL));
         }
@@ -265,7 +267,7 @@ ngx_master_process_cycle(ngx_cycle_t *cycle)
             ngx_start_cache_manager_processes(cycle, 0);
             live = 1;
         }
-
+        //重新打开服务中的所有文件
         if (ngx_reopen) {
             ngx_reopen = 0;
             ngx_log_error(NGX_LOG_NOTICE, cycle->log, 0, "reopening logs");
@@ -273,16 +275,16 @@ ngx_master_process_cycle(ngx_cycle_t *cycle)
             ngx_signal_worker_processes(cycle,
                                         ngx_signal_value(NGX_REOPEN_SIGNAL));
         }
-
+        //平滑升级到新版本的Nginx程序
         if (ngx_change_binary) {
             ngx_change_binary = 0;
             ngx_log_error(NGX_LOG_NOTICE, cycle->log, 0, "changing binary");
             ngx_new_binary = ngx_exec_new_binary(cycle, ngx_argv);
         }
-
+        //所有子进程不再接受处理新的连接，实际相当于对所有的子进程发送QUIT信号量
         if (ngx_noaccept) {
             ngx_noaccept = 0;
-            ngx_noaccepting = 1;
+            ngx_noaccepting = 1;    //表示正在停止接受新的连接
             ngx_signal_worker_processes(cycle,
                                         ngx_signal_value(NGX_SHUTDOWN_SIGNAL));
         }
@@ -558,7 +560,7 @@ ngx_signal_worker_processes(ngx_cycle_t *cycle, int signo)
     }
 }
 
-
+//遍历ngx_processes数组，检查每个子进程的状态,对于非正常退出的子进程会重新拉起
 static ngx_uint_t
 ngx_reap_children(ngx_cycle_t *cycle)
 {

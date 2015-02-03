@@ -32,7 +32,7 @@ char           **ngx_os_argv;
 
 ngx_int_t        ngx_process_slot;  //当前操作的进程在ngx_processes数组中的下标
 ngx_socket_t     ngx_channel;
-ngx_int_t        ngx_last_process;
+ngx_int_t        ngx_last_process;  //ngx_processes数组中有意义的ngx_process_t元素中最大的下标
 ngx_process_t    ngx_processes[NGX_MAX_PROCESSES];  //该数组用来管理子进程，只有master会使用这个结构
 
 
@@ -227,7 +227,7 @@ ngx_spawn_process(ngx_cycle_t *cycle, ngx_spawn_proc_pt proc, void *data,
 
     case NGX_PROCESS_JUST_SPAWN:
         ngx_processes[s].respawn = 0;
-        ngx_processes[s].just_spawn = 1;
+        ngx_processes[s].just_spawn = 1;    //创建子进程
         ngx_processes[s].detached = 0;
         break;
 
