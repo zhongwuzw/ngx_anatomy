@@ -290,16 +290,19 @@ failed:
 
 #endif
 
-
+//主要做两件事：
+//1：调用epoll_create方法创建epoll对象
+//2：创建event_list数组，用于进行epoll_wait调用时传递内核态的事件
 static ngx_int_t
 ngx_epoll_init(ngx_cycle_t *cycle, ngx_msec_t timer)
 {
     ngx_epoll_conf_t  *epcf;
-
+    //获取create_conf中生成的ngx_epoll_conf_t结构体，它已经被赋予解析完配置文件后的值
     epcf = ngx_event_get_conf(cycle->conf_ctx, ngx_epoll_module);
 
     if (ep == -1) {
-        ep = epoll_create(cycle->connection_n / 2);
+        //调用系统调用在内核中创建epoll对象
+        ep = epoll_create(cycle->connection_n / 2); //输入的这个参数没啥实际作用，可以忽略
 
         if (ep == -1) {
             ngx_log_error(NGX_LOG_EMERG, cycle->log, ngx_errno,
@@ -318,20 +321,20 @@ ngx_epoll_init(ngx_cycle_t *cycle, ngx_msec_t timer)
         if (event_list) {
             ngx_free(event_list);
         }
-
+        //初始化event_list数组，数组的个数是配置项epoll_events的参数
         event_list = ngx_alloc(sizeof(struct epoll_event) * epcf->events,
                                cycle->log);
         if (event_list == NULL) {
             return NGX_ERROR;
         }
     }
-
+    
     nevents = epcf->events;
 
     ngx_io = ngx_os_io;
 
     ngx_event_actions = ngx_epoll_module_ctx.actions;
-
+//默认使用ET模式来使用epoll，NGX_HAVE_CLEAR_EVENT宏就是告诉Nginx使用ET模式
 #if (NGX_HAVE_CLEAR_EVENT)
     ngx_event_flags = NGX_USE_CLEAR_EVENT
 #else
@@ -391,8 +394,8 @@ ngx_epoll_add_event(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags)
     ngx_connection_t    *c;
     struct epoll_event   ee;
 
-    c = ev->data;
-
+    c = ev->data;   //每个事件的data成员都存放着对应的ngx_connection_t连接
+    //通过event参数确定当前事件是读事件还是写事件，这回决定events是加上EPOLLIN标志位还是EPOLLOUT标志位
     events = (uint32_t) event;
 
     if (event == NGX_READ_EVENT) {
@@ -409,7 +412,7 @@ ngx_epoll_add_event(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags)
         events = EPOLLOUT;
 #endif
     }
-
+    //根据active标志位确定是否为活跃事件，以决定到底是修改还是添加事件
     if (e->active) {
         op = EPOLL_CTL_MOD;
         events |= prev;

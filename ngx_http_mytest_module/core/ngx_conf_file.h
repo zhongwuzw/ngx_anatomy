@@ -100,31 +100,31 @@ struct ngx_open_file_s {
 #define NGX_MODULE_V1_PADDING  0, 0, 0, 0, 0, 0, 0, 0
 
 struct ngx_module_s {
-    ngx_uint_t            ctx_index;
-    ngx_uint_t            index;
-
+    ngx_uint_t            ctx_index;    //表明了模块在相同类型模块中的顺序，加入模块是自定义的http模块，那么这个成员表示该自定义模块在所有http模块中的索引
+    ngx_uint_t            index;    //模块在ngx_modules.c文件的ngx_modules数组中的序号,该成员的初始化会在nginx的main函数中赋值
+    
     ngx_uint_t            spare0;
     ngx_uint_t            spare1;
     ngx_uint_t            spare2;
     ngx_uint_t            spare3;
-
+    
     ngx_uint_t            version;
-
-    void                 *ctx;
+    
+    void                 *ctx;  //为void *，说明其可以指向任何数据,其一般用于表示在不同类型的模块中一种类型模块所具备的通用性接口
     ngx_command_t        *commands;
     ngx_uint_t            type;
-
+    
     ngx_int_t           (*init_master)(ngx_log_t *log);
-
+    
     ngx_int_t           (*init_module)(ngx_cycle_t *cycle);
-
+    
     ngx_int_t           (*init_process)(ngx_cycle_t *cycle);
     ngx_int_t           (*init_thread)(ngx_cycle_t *cycle);
     void                (*exit_thread)(ngx_cycle_t *cycle);
     void                (*exit_process)(ngx_cycle_t *cycle);
-
+    
     void                (*exit_master)(ngx_cycle_t *cycle);
-
+    
     uintptr_t             spare_hook0;
     uintptr_t             spare_hook1;
     uintptr_t             spare_hook2;
@@ -134,6 +134,7 @@ struct ngx_module_s {
     uintptr_t             spare_hook6;
     uintptr_t             spare_hook7;
 };
+
 
 
 typedef struct {

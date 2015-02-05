@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		010447A01A71F79E0082D6F7 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0104479F1A71F79E0082D6F7 /* main.cpp */; };
+		01132DC61A836B8B00C52DC7 /* ngx_modules.c in Sources */ = {isa = PBXBuildFile; fileRef = 01132DC51A836B8B00C52DC7 /* ngx_modules.c */; };
 		014D56711A7A25CA001C435A /* nginx.c in Sources */ = {isa = PBXBuildFile; fileRef = 014D555E1A7A25CA001C435A /* nginx.c */; };
 		014D56721A7A25CA001C435A /* ngx_array.c in Sources */ = {isa = PBXBuildFile; fileRef = 014D55601A7A25CA001C435A /* ngx_array.c */; };
 		014D56731A7A25CA001C435A /* ngx_buf.c in Sources */ = {isa = PBXBuildFile; fileRef = 014D55621A7A25CA001C435A /* ngx_buf.c */; };
@@ -197,6 +198,9 @@
 /* Begin PBXFileReference section */
 		0104479C1A71F79E0082D6F7 /* ngx_anatomy */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ngx_anatomy; sourceTree = BUILT_PRODUCTS_DIR; };
 		0104479F1A71F79E0082D6F7 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		01132DC31A836B8B00C52DC7 /* ngx_auto_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ngx_auto_config.h; sourceTree = "<group>"; };
+		01132DC41A836B8B00C52DC7 /* ngx_auto_headers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ngx_auto_headers.h; sourceTree = "<group>"; };
+		01132DC51A836B8B00C52DC7 /* ngx_modules.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ngx_modules.c; sourceTree = "<group>"; };
 		014D555E1A7A25CA001C435A /* nginx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = nginx.c; sourceTree = "<group>"; };
 		014D555F1A7A25CA001C435A /* nginx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nginx.h; sourceTree = "<group>"; };
 		014D55601A7A25CA001C435A /* ngx_array.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ngx_array.c; sourceTree = "<group>"; };
@@ -500,6 +504,9 @@
 				0104479F1A71F79E0082D6F7 /* main.cpp */,
 				014D57201A7B6785001C435A /* ngx_http_mytest_module.c */,
 				014D571B1A7A3BE4001C435A /* ngx_http_mytest_module_upstream.c */,
+				01132DC31A836B8B00C52DC7 /* ngx_auto_config.h */,
+				01132DC41A836B8B00C52DC7 /* ngx_auto_headers.h */,
+				01132DC51A836B8B00C52DC7 /* ngx_modules.c */,
 				014D555D1A7A25CA001C435A /* core */,
 				014D559D1A7A25CA001C435A /* event */,
 				014D55B91A7A25CA001C435A /* http */,
@@ -924,6 +931,7 @@
 				014D56EE1A7A25CB001C435A /* ngx_mail_parse.c in Sources */,
 				014D569E1A7A25CB001C435A /* ngx_event_openssl.c in Sources */,
 				014D56721A7A25CA001C435A /* ngx_array.c in Sources */,
+				01132DC61A836B8B00C52DC7 /* ngx_modules.c in Sources */,
 				014D56E41A7A25CB001C435A /* ngx_http_upstream.c in Sources */,
 				014D570F1A7A25CB001C435A /* ngx_send.c in Sources */,
 				014D56C51A7A25CB001C435A /* ngx_http_scgi_module.c in Sources */,
@@ -1163,10 +1171,10 @@
 		010447A41A71F79E0082D6F7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_C_LANGUAGE_STANDARD = gnu99;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"/Users/frank/Downloads/nginx-1.6.2/src/**",
 				);
 				PRODUCT_NAME = ngx_anatomy;
 			};
@@ -1175,10 +1183,10 @@
 		010447A51A71F79E0082D6F7 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_C_LANGUAGE_STANDARD = gnu99;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"/Users/frank/Downloads/nginx-1.6.2/src/**",
 				);
 				PRODUCT_NAME = ngx_anatomy;
 			};

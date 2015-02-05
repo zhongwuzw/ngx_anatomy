@@ -36,6 +36,7 @@ static ngx_connection_t  dumb;
 /* STUB */
 
 //有了配置文件，Nginx框架就开始根据配置项来加载所有的模块了，这一步骤就在此方法中进行,从函数名字就知道，它是用来构造ngx_cycle_t结构体中成员的
+//此方法会解析配置项
 ngx_cycle_t *
 ngx_init_cycle(ngx_cycle_t *old_cycle)  //old_cycle表示临时的ngx_cycle_t指针，一般仅用来传递ngx_cycle_t结构体中的配置文件路径等参数
 {
