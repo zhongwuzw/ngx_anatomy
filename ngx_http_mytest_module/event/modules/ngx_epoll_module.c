@@ -167,7 +167,7 @@ ngx_event_module_t  ngx_epoll_module_ctx = {
         NULL,                            /* process the changes */
         ngx_epoll_process_events,        /* process the events */
         ngx_epoll_init,                  /* init the events */
-        ngx_epoll_done,                  /* done the events */
+        ngx_epoll_done,                  /* done the events */  //在Nginx退出服务时它会得到调用，其做的工作主要是关闭epoll描述符ep，同时释放event_list数组
     }
 };
 
@@ -422,7 +422,7 @@ ngx_epoll_add_event(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags)
     }
 
     ee.events = events | (uint32_t) flags;
-    ee.data.ptr = (void *) ((uintptr_t) c | ev->instance);
+    ee.data.ptr = (void *) ((uintptr_t) c | ev->instance);  //注意这里做了一个或的操作,所以ptr指针可能并不是指向connection结构体,所以在后面的ngx_epoll_process_events函数中会进行还原来获取connection的指针,因为c是一个地址，注意，无论是32位还是64位，地址的最后一位肯定是0
 
     ngx_log_debug3(NGX_LOG_DEBUG_EVENT, ev->log, 0,
                    "epoll add event: fd:%d op:%d ev:%08XD",
@@ -562,7 +562,7 @@ ngx_epoll_del_connection(ngx_connection_t *c, ngx_uint_t flags)
     return NGX_OK;
 }
 
-
+//实现收集、分发事件
 static ngx_int_t
 ngx_epoll_process_events(ngx_cycle_t *cycle, ngx_msec_t timer, ngx_uint_t flags)
 {
@@ -582,7 +582,7 @@ ngx_epoll_process_events(ngx_cycle_t *cycle, ngx_msec_t timer, ngx_uint_t flags)
     events = epoll_wait(ep, event_list, (int) nevents, timer);
 
     err = (events == -1) ? ngx_errno : 0;
-
+    //当flags标志位指示要更新时间时，在这里更新,在事件核心初始化的时候会创建一个timer，详见ngx_event.c文件
     if (flags & NGX_UPDATE_TIME || ngx_event_timer_alarm) {
         ngx_time_update();
     }
@@ -616,15 +616,16 @@ ngx_epoll_process_events(ngx_cycle_t *cycle, ngx_msec_t timer, ngx_uint_t flags)
     }
 
     ngx_mutex_lock(ngx_posted_events_mutex);
-
+    //遍历本次epoll_wait返回的所有事件
     for (i = 0; i < events; i++) {
         c = event_list[i].data.ptr;
 
-        instance = (uintptr_t) c & 1;
-        c = (ngx_connection_t *) ((uintptr_t) c & (uintptr_t) ~1);
+        instance = (uintptr_t) c & 1;   //将instance变量取出来，为什么可以把instance变量放在指针中呢？就是利用了c因为是一个指针，指针的最后一位一定是0这一特性
+        c = (ngx_connection_t *) ((uintptr_t) c & (uintptr_t) ~1); //c是在ngx_epoll_add_event中赋的值
+
 
         rev = c->read;
-
+        //判断这个读事件是否过期
         if (c->fd == -1 || rev->instance != instance) {
 
             /*
@@ -636,7 +637,7 @@ ngx_epoll_process_events(ngx_cycle_t *cycle, ngx_msec_t timer, ngx_uint_t flags)
                            "epoll: stale event %p", c);
             continue;
         }
-
+        //取出事件类型
         revents = event_list[i].events;
 
         ngx_log_debug3(NGX_LOG_DEBUG_EVENT, cycle->log, 0,
@@ -683,22 +684,24 @@ ngx_epoll_process_events(ngx_cycle_t *cycle, ngx_msec_t timer, ngx_uint_t flags)
             } else {
                 rev->ready = 1;
             }
-
+            //flags参数中含有NGX_POST_EVENTS表示这批事件要延后处理
             if (flags & NGX_POST_EVENTS) {
+                /* 如果要在post队列中延后处理该事件，首先要判断它是新连接事件还是普通事件，以决定把它加入到ngx_posted_accept_events队列或者ngx_posted_events队列中 */
                 queue = (ngx_event_t **) (rev->accept ?
                                &ngx_posted_accept_events : &ngx_posted_events);
-
+                //将这个事件添加到相应的延后执行队列中
                 ngx_locked_post_event(rev, queue);
 
             } else {
+                //立即调用读事件的回调方法来处理这个事件
                 rev->handler(rev);
             }
         }
-
+        //取出写事件
         wev = c->write;
 
         if ((revents & EPOLLOUT) && wev->active) {
-
+            //判断这个写事件是否为过期事件
             if (c->fd == -1 || wev->instance != instance) {
 
                 /*

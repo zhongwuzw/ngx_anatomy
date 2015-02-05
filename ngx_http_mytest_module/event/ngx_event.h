@@ -43,7 +43,7 @@ struct ngx_event_s {
     unsigned         accept:1;  //表示可以建立新的连接，通常情况下，只有监听套接字事件这个标志位才可能为1
 
     /* used to detect the stale events in kqueue, rtsig, and epoll */
-    unsigned         instance:1;    //用于区分当前事件是否过期
+    unsigned         instance:1;    //用于区分当前事件是否过期,至于过期事件到底是怎么回事，看一下我的印象笔记
 
     /*
      * the event was passed or would be passed to a kernel;
