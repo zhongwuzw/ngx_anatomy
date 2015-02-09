@@ -16,7 +16,7 @@
 typedef struct {
     time_t      sec;
     ngx_uint_t  msec;
-    ngx_int_t   gmtoff;
+    ngx_int_t   gmtoff; //时区
 } ngx_time_t;
 
 

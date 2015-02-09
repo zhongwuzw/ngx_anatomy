@@ -50,7 +50,7 @@ ngx_atomic_t         *ngx_connection_counter = &connection_counter;
 
 
 ngx_atomic_t         *ngx_accept_mutex_ptr;
-ngx_shmtx_t           ngx_accept_mutex;
+ngx_shmtx_t           ngx_accept_mutex; //Nginx进程间的同步锁
 ngx_uint_t            ngx_use_accept_mutex;
 ngx_uint_t            ngx_accept_events;
 ngx_uint_t            ngx_accept_mutex_held;
@@ -221,16 +221,25 @@ ngx_process_events_and_timers(ngx_cycle_t *cycle)
 
 #endif
     }
-
+    
+    //如果ngx_trylock_accept_mutex没有获取到锁，接下来调用事件模块的process_events方法时只能处理已有的连接上的事件；如果获取到了锁，调用process_events方法时就会即处理已有连接上的事件，也处理新连接的事件
     if (ngx_use_accept_mutex) {
+        
+        //ngx_accept_disabled实现负载均衡,ngx_accept_disabled的计算公式是ngx_accept_disabled = ngx_cycle->connection_n/8 - ngx_cycle->free_connection_n，所以，在Nginx启动时，ngx_accept_disabled的值就是一个负值,其值的绝对值为连接总数的7/8，ngx_accept_disabled的用法很简单，当它为负数时，不会进行触发负载均衡操作，而当ngx_accept_disabled为正数时，就会触发Nginx进行负载均衡操作了,当前进程将不再处理新连接事件，取而代之的仅仅是ngx_accept_disabled减1,也就是说，在当前使用的连接到达总连接数的7/8时，就不会再处理新连接了
         if (ngx_accept_disabled > 0) {
             ngx_accept_disabled--;
 
         } else {
+            
+            //如果进程获取到锁后，处理这些事件会占用很长的时间，就会导致很长时间都没有释放ngx_accept_mutex锁，Nginx使用ngx_posted_accept_events队列和ngx_posted_events队列解决这个问题。
+            //首先调用ngx_trylock_accept_mutex视图处理监听端口的新连接事件
+            //注意NGX_ERROR只有在出错的情况下才返回这个，并不是说没有获取到锁返回这个，ngx_trylock_accept_mutex方法中会处理如果获取到锁，会将监听端口的新连接事件加入epoll等事件处理模块
             if (ngx_trylock_accept_mutex(cycle) == NGX_ERROR) {
                 return;
             }
-
+            
+            //ngx_accept_mutex_held为1，就表示开始处理新连接事件了，这时将flags标志位加上NGX_POST_EVENTS,这个flags会作为ngx_epoll_process_events方法中的第三个参数，在ngx_epoll_process_events这个方法中，会判断如果flags标志位包含NGX_POST_EVENTS时是不会立刻调用事件的handler回调方法的
+            //当把新连接事件放到ngx_posted_accept_events队列，普通事件放到ngx_posted_events队列中，这样接下来会先处理ngx_posted_accept_events队列中的事件，处理完后就会立即释放ngx_accept_mutex锁，接着再处理ngx_posted_events队列中的事件，这样就大大减少了ngx_accept_mutex锁占用的时间
             if (ngx_accept_mutex_held) {
                 flags |= NGX_POST_EVENTS;
 
@@ -252,11 +261,11 @@ ngx_process_events_and_timers(ngx_cycle_t *cycle)
 
     ngx_log_debug1(NGX_LOG_DEBUG_EVENT, cycle->log, 0,
                    "timer delta: %M", delta);
-
+    //先处理ngx_posted_accept_events队列中的事件，这个队列存放的是处理建立新连接的事件
     if (ngx_posted_accept_events) {
         ngx_event_process_posted(cycle, &ngx_posted_accept_events);
     }
-
+    //把ngx_accept_mutex锁释放掉，因为上面已经处理完了当前进程的ngx_posted_accept_events队列的事件，这个时候将锁释放掉以便让其他worker进程也能accept新连接
     if (ngx_accept_mutex_held) {
         ngx_shmtx_unlock(&ngx_accept_mutex);
     }

@@ -23,7 +23,7 @@ static ngx_rbtree_node_t          ngx_event_timer_sentinel;
  * it should not be a problem, because we use the rbtree to find
  * a minimum timer value only
  */
-
+//初始化定时器
 ngx_int_t
 ngx_event_timer_init(ngx_log_t *log)
 {
@@ -47,7 +47,7 @@ ngx_event_timer_init(ngx_log_t *log)
     return NGX_OK;
 }
 
-
+//找出红黑树中最左边的节点，如果它的超时时间大于当前时间，也就表明目前的定时器中没有一个事件满足触发条件，这是返回这个超时与当前事件的差值，也就是需要经过多少毫秒会有事件触发;如果它的超时时间小于或等于当前时间，则返回0，表示定时器中已经存在超时需要触发的事件
 ngx_msec_t
 ngx_event_find_timer(void)
 {
@@ -72,7 +72,7 @@ ngx_event_find_timer(void)
     return (ngx_msec_t) (timer > 0 ? timer : 0);
 }
 
-
+//检查定时器中的所有事件，按照红黑树关键字由小到大的顺序一次调用已经满足超时条件需要触发事件的handler回调方法
 void
 ngx_event_expire_timers(void)
 {
