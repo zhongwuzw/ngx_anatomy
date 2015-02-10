@@ -9,7 +9,7 @@
 #include <ngx_core.h>
 #include <ngx_event.h>
 
-
+//这两个指针都指向事件队列中的首个事件，这些事件以双向链表的形式组织成post事件队列。
 ngx_thread_volatile ngx_event_t  *ngx_posted_accept_events;
 ngx_thread_volatile ngx_event_t  *ngx_posted_events;
 
@@ -17,7 +17,7 @@ ngx_thread_volatile ngx_event_t  *ngx_posted_events;
 ngx_mutex_t                      *ngx_posted_events_mutex;
 #endif
 
-
+//调用posted事件队列中所有事件的handler回调方法，这个事件调用完handler方法后，就会从posted事件队列中删除
 void
 ngx_event_process_posted(ngx_cycle_t *cycle,
     ngx_thread_volatile ngx_event_t **posted)

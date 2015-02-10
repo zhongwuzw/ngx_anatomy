@@ -204,14 +204,15 @@ ngx_process_events_and_timers(ngx_cycle_t *cycle)
 {
     ngx_uint_t  flags;
     ngx_msec_t  timer, delta;
-
+    
+    //如果用户自己配置了timer_resolution配置项，那么将timer设为-1，这就会告诉下面调用的ngx_process_events方法在检测事件时不要等待，直接搜集所有已经就绪的事件然后返回
     if (ngx_timer_resolution) {
-        timer = NGX_TIMER_INFINITE;
+        timer = NGX_TIMER_INFINITE; //NGX_TIMER_INFINITE值为-1
         flags = 0;
 
     } else {
-        timer = ngx_event_find_timer();
-        flags = NGX_UPDATE_TIME;
+        timer = ngx_event_find_timer(); //找到最近一个将要触发的事件距离现在有多少毫秒，将其赋给timer参数，这样ngx_process_events在检测事件时如果没有任何事件，最多等待timer毫秒就返回
+        flags = NGX_UPDATE_TIME;    //告诉ngx_process_events方法更新缓存的时间
 
 #if (NGX_THREADS)
 
@@ -238,12 +239,15 @@ ngx_process_events_and_timers(ngx_cycle_t *cycle)
                 return;
             }
             
-            //ngx_accept_mutex_held为1，就表示开始处理新连接事件了，这时将flags标志位加上NGX_POST_EVENTS,这个flags会作为ngx_epoll_process_events方法中的第三个参数，在ngx_epoll_process_events这个方法中，会判断如果flags标志位包含NGX_POST_EVENTS时是不会立刻调用事件的handler回调方法的
+            //ngx_accept_mutex_held为1，说明已经获取到了accept_mutex锁，就表示开始处理新连接事件了，这时将flags标志位加上NGX_POST_EVENTS,这个flags会作为ngx_epoll_process_events方法中的第三个参数，在ngx_epoll_process_events这个方法中，会判断如果flags标志位包含NGX_POST_EVENTS时是不会立刻调用事件的handler回调方法的
             //当把新连接事件放到ngx_posted_accept_events队列，普通事件放到ngx_posted_events队列中，这样接下来会先处理ngx_posted_accept_events队列中的事件，处理完后就会立即释放ngx_accept_mutex锁，接着再处理ngx_posted_events队列中的事件，这样就大大减少了ngx_accept_mutex锁占用的时间
             if (ngx_accept_mutex_held) {
                 flags |= NGX_POST_EVENTS;
 
-            } else {
+            }
+            else    //如果没有获取到accept_mutex锁，则意味着既不能让当前worker进程频繁地试图抢锁，也不能让它经过太长时间再去抢锁
+            {
+                //if语句成立包括两种情况timer等于NGX_TIMER_INFINITE（原来如果为NGX_TIMER_INFINITE，则后面的事件检测时检测事件后会立即返回，不会等待)，这种情况是在开启了timer_resolution的下发生，也就是说，这个时候修改掉timer，不让检测事件的函数立即返回，至少等待ngx_accept_mutex_delay毫秒；后一个成立的情况是，没有开启时间精度时，如果最近一个定时器事件的超时时间距离现在超过了ngx_accept_mutex_delay毫秒，也要将timer设置为新的ngx_accept_mutex_delay，不让ngx_process_events检测事件的方法在没有新事件的时候等待时间超过ngx_accept_mutex_delay毫秒，这会影响整个负载均衡
                 if (timer == NGX_TIMER_INFINITE
                     || timer > ngx_accept_mutex_delay)
                 {
@@ -253,8 +257,9 @@ ngx_process_events_and_timers(ngx_cycle_t *cycle)
         }
     }
 
-    delta = ngx_current_msec;
-
+    delta = ngx_current_msec;   //delta用来计算下面一行ngx_process_events方法的执行时间，它会影响后面触发定时器的执行
+    
+    //实现收集、分发事件，可看一下epoll实现的这个方法ngx_epoll_process_events，传入的timer和flags会影响时间精度以及事件是否会在post队列中处理
     (void) ngx_process_events(cycle, timer, flags);
 
     delta = ngx_current_msec - delta;
@@ -269,11 +274,12 @@ ngx_process_events_and_timers(ngx_cycle_t *cycle)
     if (ngx_accept_mutex_held) {
         ngx_shmtx_unlock(&ngx_accept_mutex);
     }
-
+    
+    //处理定时器事件
     if (delta) {
         ngx_event_expire_timers();
     }
-
+    
     ngx_log_debug1(NGX_LOG_DEBUG_EVENT, cycle->log, 0,
                    "posted events %p", ngx_posted_events);
 

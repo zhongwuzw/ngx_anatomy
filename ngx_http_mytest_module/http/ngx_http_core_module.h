@@ -155,7 +155,7 @@ typedef struct {
 
 
 typedef struct {
-    ngx_array_t                servers;         /* ngx_http_core_srv_conf_t */
+    ngx_array_t                servers;         /* 存放ngx_http_core_srv_conf_t */
 
     ngx_http_phase_engine_t    phase_engine;
 
@@ -187,7 +187,7 @@ typedef struct {
     ngx_array_t                 server_names;
 
     /* server ctx */
-    ngx_http_conf_ctx_t        *ctx;
+    ngx_http_conf_ctx_t        *ctx;    //每个server块同样会创建一个ngx_http_conf_ctx_t结构体
 
     ngx_str_t                   server_name;
 
@@ -314,6 +314,7 @@ typedef struct {
 } ngx_http_try_file_t;
 
 
+//该结构体会在ngx_http_core_module的create_loc_conf方法中生成
 struct ngx_http_core_loc_conf_s {
     ngx_str_t     name;          /* location name */
 
@@ -342,7 +343,7 @@ struct ngx_http_core_loc_conf_s {
 #endif
 
     /* pointer to the modules' loc_conf */
-    void        **loc_conf;
+    void        **loc_conf; //指向所属location块内ngx_http_conf_ctx_t结构体中的loc_conf指针数组，它保存着当前location块内所有http模块create_loc_conf方法产生的结构体指针
 
     uint32_t      limit_except;
     void        **limit_except_loc_conf;
@@ -444,8 +445,8 @@ struct ngx_http_core_loc_conf_s {
 
     ngx_uint_t    types_hash_max_size;
     ngx_uint_t    types_hash_bucket_size;
-
-    ngx_queue_t  *locations;
+    
+    ngx_queue_t  *locations;    //将同一个server块内多个表达式location块的ngx_http_loc_conf_t结构体以双向链表方式组织起来，该locations指针将指向ngx_http_location_queue_t结构体
 
 #if 0
     ngx_http_core_loc_conf_t  *prev_location;
@@ -455,13 +456,13 @@ struct ngx_http_core_loc_conf_s {
 
 typedef struct {
     ngx_queue_t                      queue;
-    ngx_http_core_loc_conf_t        *exact;
-    ngx_http_core_loc_conf_t        *inclusive;
-    ngx_str_t                       *name;
+    ngx_http_core_loc_conf_t        *exact; //如果location中的字符串可以精确匹配（包括正则表达式），exact将指向对应的ngx_http_core_loc_conf_t结构体，否则值为NULL
+    ngx_http_core_loc_conf_t        *inclusive; //如果location中的字符串无法精确匹配（包括了自定义的通配符），inclusive将指向对应的ngx_http_core_loc_conf_t结构体，否则值为NULL
+    ngx_str_t                       *name;  //location的名称
     u_char                          *file_name;
     ngx_uint_t                       line;
     ngx_queue_t                      list;
-} ngx_http_location_queue_t;
+} ngx_http_location_queue_t;    //该结构体将帮助用户把所有的location块与其所属的server块关联起来
 
 
 struct ngx_http_location_tree_node_s {

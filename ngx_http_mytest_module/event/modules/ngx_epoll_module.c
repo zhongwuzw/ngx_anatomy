@@ -221,13 +221,14 @@ io_getevents(aio_context_t ctx, long min_nr, long nr, struct io_event *events,
 }
 
 
+//该方法会把异步I/O与epoll结合起来，当某一个异步I/O事件完成后，ngx_eventfd句柄就处于可用状态，这样epoll_wait在返回ngx_eventfd_event事件后就会调用它的回调方法ngx_epoll_eventfd_handler处理已经完成的异步I/O事件
 static void
 ngx_epoll_aio_init(ngx_cycle_t *cycle, ngx_epoll_conf_t *epcf)
 {
     int                 n;
     struct epoll_event  ee;
 
-    ngx_eventfd = syscall(SYS_eventfd, 0);
+    ngx_eventfd = syscall(SYS_eventfd, 0);  //SYS_eventfd值为323，该方法的意思是使用linux中第323个系统调用获取一个描述符句柄
 
     if (ngx_eventfd == -1) {
         ngx_log_error(NGX_LOG_EMERG, cycle->log, ngx_errno,
@@ -240,7 +241,7 @@ ngx_epoll_aio_init(ngx_cycle_t *cycle, ngx_epoll_conf_t *epcf)
                    "eventfd: %d", ngx_eventfd);
 
     n = 1;
-
+    //设置为无阻塞
     if (ioctl(ngx_eventfd, FIONBIO, &n) == -1) {
         ngx_log_error(NGX_LOG_EMERG, cycle->log, ngx_errno,
                       "ioctl(eventfd, FIONBIO) failed");
@@ -562,6 +563,8 @@ ngx_epoll_del_connection(ngx_connection_t *c, ngx_uint_t flags)
     return NGX_OK;
 }
 
+
+//在ngx_process_events_and_timers中被调用
 //实现收集、分发事件
 static ngx_int_t
 ngx_epoll_process_events(ngx_cycle_t *cycle, ngx_msec_t timer, ngx_uint_t flags)
@@ -684,7 +687,7 @@ ngx_epoll_process_events(ngx_cycle_t *cycle, ngx_msec_t timer, ngx_uint_t flags)
             } else {
                 rev->ready = 1;
             }
-            //flags参数中含有NGX_POST_EVENTS表示这批事件要延后处理
+            //flags参数中含有NGX_POST_EVENTS表示这批事件要延后处理,NGX_POST_EVENTS参数在ngx_process_events_and_timers中设置，当worker进程拿到accept_mutex时，就会将flags设置这个参数，它的目的是让事件放入队列中，然后先处理完ngx_posted_accept_events队列的事件后尽早的释放掉accept_mutex锁让其它worker进程能够处理新的tcp连接
             if (flags & NGX_POST_EVENTS) {
                 /* 如果要在post队列中延后处理该事件，首先要判断它是新连接事件还是普通事件，以决定把它加入到ngx_posted_accept_events队列或者ngx_posted_events队列中 */
                 queue = (ngx_event_t **) (rev->accept ?
@@ -738,6 +741,7 @@ ngx_epoll_process_events(ngx_cycle_t *cycle, ngx_msec_t timer, ngx_uint_t flags)
 
 #if (NGX_HAVE_FILE_AIO)
 
+//处理已经完成的异步I/O事件
 static void
 ngx_epoll_eventfd_handler(ngx_event_t *ev)
 {
@@ -747,11 +751,11 @@ ngx_epoll_eventfd_handler(ngx_event_t *ev)
     ngx_err_t         err;
     ngx_event_t      *e;
     ngx_event_aio_t  *aio;
-    struct io_event   event[64];
+    struct io_event   event[64];    //一次性最多处理64个事件
     struct timespec   ts;
 
     ngx_log_debug0(NGX_LOG_DEBUG_EVENT, ev->log, 0, "eventfd handler");
-
+    //获取已经完成的事件数目
     n = read(ngx_eventfd, &ready, 8);
 
     err = ngx_errno;
@@ -777,15 +781,19 @@ ngx_epoll_eventfd_handler(ngx_event_t *ev)
     ts.tv_nsec = 0;
 
     while (ready) {
-
+        
+        //获取已经完成的异步I/O事件
         events = io_getevents(ngx_aio_ctx, 1, 64, event, &ts);
 
         ngx_log_debug1(NGX_LOG_DEBUG_EVENT, ev->log, 0,
                        "io_getevents: %l", events);
 
         if (events > 0) {
+            
+            //将ready减去已经取出的事件
             ready -= events;
 
+            //开始处理事件
             for (i = 0; i < events; i++) {
 
                 ngx_log_debug4(NGX_LOG_DEBUG_EVENT, ev->log, 0,
@@ -801,7 +809,8 @@ ngx_epoll_eventfd_handler(ngx_event_t *ev)
 
                 aio = e->data;
                 aio->res = event[i].res;
-
+                
+                //将该事件放到ngx_posted_events队列中延后执行
                 ngx_post_event(e, &ngx_posted_events);
             }
 
