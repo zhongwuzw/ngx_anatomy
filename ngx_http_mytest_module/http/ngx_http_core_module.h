@@ -446,7 +446,7 @@ struct ngx_http_core_loc_conf_s {
     ngx_uint_t    types_hash_max_size;
     ngx_uint_t    types_hash_bucket_size;
     
-    ngx_queue_t  *locations;    //将同一个server块内多个表达式location块的ngx_http_loc_conf_t结构体以双向链表方式组织起来，该locations指针将指向ngx_http_location_queue_t结构体
+    ngx_queue_t  *locations;    //将同一个server块内或location块（因为location也可以嵌套）多个表达式location块的ngx_http_loc_conf_t结构体以双向链表方式组织起来，该locations指针将指向ngx_http_location_queue_t结构体
 
 #if 0
     ngx_http_core_loc_conf_t  *prev_location;
