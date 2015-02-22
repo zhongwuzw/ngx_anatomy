@@ -558,7 +558,8 @@ ngx_http_init_phase_handlers(ngx_conf_t *cf, ngx_http_core_main_conf_t *cmcf)
     return NGX_OK;
 }
 
-
+//该函数不只是合并了server相关的配置，它同时也会合并location相关的配置项
+//ngx_http_core_main_conf_t结构体是http_core_module模块生成的
 static char *
 ngx_http_merge_servers(ngx_conf_t *cf, ngx_http_core_main_conf_t *cmcf,
     ngx_http_module_t *module, ngx_uint_t ctx_index)
@@ -568,7 +569,8 @@ ngx_http_merge_servers(ngx_conf_t *cf, ngx_http_core_main_conf_t *cmcf,
     ngx_http_conf_ctx_t         *ctx, saved;
     ngx_http_core_loc_conf_t    *clcf;
     ngx_http_core_srv_conf_t   **cscfp;
-
+    
+    //从ngx_http_core_main_conf_t的servers动态数组中可以获取所有的ngx_http_core_srv_conf_t结构体
     cscfp = cmcf->servers.elts;
     ctx = (ngx_http_conf_ctx_t *) cf->ctx;
     saved = *ctx;

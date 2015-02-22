@@ -109,7 +109,7 @@ typedef struct {
     u_char                     addr[NGX_SOCKADDR_STRLEN + 1];
 } ngx_http_listen_opt_t;
 
-
+//《深入理解Nginx模块》中373页对每一个阶段有详细解释
 typedef enum {
     NGX_HTTP_POST_READ_PHASE = 0,
 
@@ -153,7 +153,7 @@ typedef struct {
     ngx_array_t                handlers;
 } ngx_http_phase_t;
 
-
+//应该只会生成一个这样的结构体实例
 typedef struct {
     ngx_array_t                servers;         /* 存放ngx_http_core_srv_conf_t */
 
@@ -174,7 +174,7 @@ typedef struct {
 
     ngx_hash_keys_arrays_t    *variables_keys;
 
-    ngx_array_t               *ports;
+    ngx_array_t               *ports;   //存放http{}块下监听的所有ngx_http_conf_port_t端口
 
     ngx_uint_t                 try_files;       /* unsigned  try_files:1 */
 
@@ -209,8 +209,6 @@ typedef struct {
 #endif
 
     ngx_http_core_loc_conf_t  **named_locations;
-} ngx_http_core_srv_conf_t;
-
 
 /* list of structures to find core_srv_conf quickly at run time */
 
@@ -279,10 +277,11 @@ typedef struct {
 
 
 typedef struct {
-    ngx_http_listen_opt_t      opt;
+    ngx_http_listen_opt_t      opt; //接听套接字的各种属性
 
-    ngx_hash_t                 hash;
-    ngx_hash_wildcard_t       *wc_head;
+    //3个散列表用于确定到底使用哪个server{}虚拟主机下的配置来处理它，所以，散列表的值就是ngx_http_core_srv_conf_t结构体的地址
+    ngx_hash_t                 hash;    //完全匹配server name的散列表
+    ngx_hash_wildcard_t       *wc_head; //通配符前置的散列表
     ngx_hash_wildcard_t       *wc_tail;
 
 #if (NGX_PCRE)
