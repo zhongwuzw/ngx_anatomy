@@ -378,9 +378,9 @@ struct ngx_http_request_s {
     /* of ngx_http_upstream_state_t */
     
     ngx_pool_t                       *pool;
-    ngx_buf_t                        *header_in;
+    ngx_buf_t                        *header_in;//用于接收http请求内容的缓冲区，主要用于接收http头部
     
-    ngx_http_headers_in_t             headers_in;
+    ngx_http_headers_in_t             headers_in;   //接收、解析完http请求的头部后，会把解析完的每一个http头部加入到headers_in的headers链表中，同时会构造headers_in中的其它成员
     ngx_http_headers_out_t            headers_out;
     
     ngx_http_request_body_t          *request_body;
@@ -401,7 +401,7 @@ struct ngx_http_request_s {
     ngx_str_t                         method_name;
     ngx_str_t                         http_protocol;
     
-    ngx_chain_t                      *out;
+    ngx_chain_t                      *out;  //表示需要发送给客户端的http响应。out中保存着由headers_out中序列化后的表示http头部的tcp流。在调用ngx_http_output_filter方法后，out中还会保存待发送的http包体，它是实现异步发送http响应的关键
     ngx_http_request_t               *main;
     ngx_http_request_t               *parent;
     ngx_http_postponed_request_t     *postponed;    //其是一个链表,postpone模块会把待转发的响应包体放在这个链表中，只有优先转发的子请求结束后才会开始转发下一个子请求中的响应
@@ -440,7 +440,7 @@ struct ngx_http_request_s {
     ngx_http_cleanup_t               *cleanup;
     
     unsigned                          subrequests:8;
-    unsigned                          count:8;
+    unsigned                          count:8;  //作为引用计数，每当派生出子请求时，原始请求的count成员都会加1，在真正销毁请求前，可以通过检查count成员是否为0以确认是否销毁原始请求，这样可以做到唯有所有子请求都结束时，原始请求才会销毁，内存池、TCP连接等资源才会释放
     unsigned                          blocked:8;
     
     unsigned                          aio:1;
