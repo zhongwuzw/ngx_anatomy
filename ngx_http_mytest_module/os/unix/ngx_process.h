@@ -22,7 +22,7 @@ typedef void (*ngx_spawn_proc_pt) (ngx_cycle_t *cycle, void *data);
 typedef struct {
     ngx_pid_t           pid;
     int                 status;
-    ngx_socket_t        channel[2];
+    ngx_socket_t        channel[2]; //socketpair创建的套接字对
 
     ngx_spawn_proc_pt   proc;
     void               *data;

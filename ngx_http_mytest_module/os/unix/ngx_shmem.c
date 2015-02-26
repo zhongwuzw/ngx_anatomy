@@ -14,6 +14,7 @@
 ngx_int_t
 ngx_shm_alloc(ngx_shm_t *shm)
 {
+    //开辟一块shm_size大小且可以读/写的共享内存，内存首地址存放在addr中
     shm->addr = (u_char *) mmap(NULL, shm->size,
                                 PROT_READ|PROT_WRITE,
                                 MAP_ANON|MAP_SHARED, -1, 0);
