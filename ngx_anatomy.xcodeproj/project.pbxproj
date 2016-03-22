@@ -181,6 +181,7 @@
 		014D571A1A7A25CB001C435A /* rfork_thread.S in Sources */ = {isa = PBXBuildFile; fileRef = 014D56701A7A25CA001C435A /* rfork_thread.S */; };
 		014D571C1A7A3BE4001C435A /* ngx_http_mytest_module_upstream.c in Sources */ = {isa = PBXBuildFile; fileRef = 014D571B1A7A3BE4001C435A /* ngx_http_mytest_module_upstream.c */; };
 		014D57211A7B6785001C435A /* ngx_http_mytest_module.c in Sources */ = {isa = PBXBuildFile; fileRef = 014D57201A7B6785001C435A /* ngx_http_mytest_module.c */; };
+		0E5C076E1C901433002470A6 /* ngx_kafka_module.c in Sources */ = {isa = PBXBuildFile; fileRef = 0E5C076D1C901433002470A6 /* ngx_kafka_module.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -469,6 +470,7 @@
 		014D56701A7A25CA001C435A /* rfork_thread.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = rfork_thread.S; sourceTree = "<group>"; };
 		014D571B1A7A3BE4001C435A /* ngx_http_mytest_module_upstream.c */ = {isa = PBXFileReference; fileEncoding = 2147483673; lastKnownFileType = sourcecode.c.c; path = ngx_http_mytest_module_upstream.c; sourceTree = "<group>"; };
 		014D57201A7B6785001C435A /* ngx_http_mytest_module.c */ = {isa = PBXFileReference; fileEncoding = 2147483673; lastKnownFileType = sourcecode.c.c; path = ngx_http_mytest_module.c; sourceTree = "<group>"; };
+		0E5C076D1C901433002470A6 /* ngx_kafka_module.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ngx_kafka_module.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -507,6 +509,7 @@
 				01132DC31A836B8B00C52DC7 /* ngx_auto_config.h */,
 				01132DC41A836B8B00C52DC7 /* ngx_auto_headers.h */,
 				01132DC51A836B8B00C52DC7 /* ngx_modules.c */,
+				0E5C076D1C901433002470A6 /* ngx_kafka_module.c */,
 				014D555D1A7A25CA001C435A /* core */,
 				014D559D1A7A25CA001C435A /* event */,
 				014D55B91A7A25CA001C435A /* http */,
@@ -1014,6 +1017,7 @@
 				014D56D21A7A25CB001C435A /* ngx_http_xslt_filter_module.c in Sources */,
 				014D56F41A7A25CB001C435A /* ngx_mail_ssl_module.c in Sources */,
 				014D57161A7A25CB001C435A /* ngx_time.c in Sources */,
+				0E5C076E1C901433002470A6 /* ngx_kafka_module.c in Sources */,
 				014D56C01A7A25CB001C435A /* ngx_http_random_index_module.c in Sources */,
 				014D56C31A7A25CB001C435A /* ngx_http_referer_module.c in Sources */,
 				014D56A81A7A25CB001C435A /* ngx_http_browser_module.c in Sources */,
@@ -1175,6 +1179,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					/usr/local/include,
 				);
 				PRODUCT_NAME = ngx_anatomy;
 			};
@@ -1187,6 +1192,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					/usr/local/include,
 				);
 				PRODUCT_NAME = ngx_anatomy;
 			};
