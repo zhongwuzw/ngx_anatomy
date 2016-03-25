@@ -47,8 +47,6 @@ typedef struct {
     
     rd_kafka_topic_t       *rkt;
     rd_kafka_topic_conf_t  *rktc;
-    
-    ngx_log_t *log;
 } ngx_http_kafka_loc_conf_t;
 
 static ngx_command_t ngx_http_kafka_commands[] = {
@@ -198,13 +196,10 @@ void *ngx_http_kafka_create_loc_conf(ngx_conf_t *cf)
     if (conf == NULL) {
         return NGX_CONF_ERROR;
     }
-    
     ngx_str_null(&conf->topic);
     ngx_str_null(&conf->broker);
     ngx_str_null(&conf->redis_host);
     conf->redis_flag = NGX_CONF_UNSET;
-    conf->log = cf->log;
-    
     return conf;
 }
 
@@ -258,7 +253,7 @@ char *ngx_http_set_kafka_broker(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 }
 
 void ngx_http_kafka_main_conf_redis_host_add(ngx_http_kafka_main_conf_t *cf,
-                                             ngx_str_t *redis_host, ngx_pool_t *pool)
+                                         ngx_str_t *redis_host, ngx_pool_t *pool)
 {
     
     int port = 6379;
@@ -318,7 +313,7 @@ static ngx_int_t ngx_http_kafka_handler(ngx_http_request_t *r)
 
 static void ngx_http_kafka_post_callback_handler(ngx_http_request_t *r)
 {
-    static const char rc[] = "ok\n";
+    static const char rc[] = "success\n";
     
     int                          nbufs;
     u_char                      *msg;
@@ -395,7 +390,7 @@ static void ngx_http_kafka_post_callback_handler(ngx_http_request_t *r)
             }
             
             rd_kafka_produce(local_conf->rkt, RD_KAFKA_PARTITION_UA,
-                             RD_KAFKA_MSG_F_COPY, (void *)msg, len, NULL, 0, local_conf->log);
+                             RD_KAFKA_MSG_F_COPY, (void *)msg, len, NULL, 0, r->connection->log);
         }
         
     }
@@ -453,7 +448,7 @@ static void ngx_http_kafka_post_callback_handler(ngx_http_request_t *r)
         }
         
         rd_kafka_produce(local_conf->rkt, RD_KAFKA_PARTITION_UA,
-                         RD_KAFKA_MSG_F_COPY, (void *)msg, len, NULL, 0, local_conf->log);
+                         RD_KAFKA_MSG_F_COPY, (void *)msg, len, NULL, 0, r->connection->log);
     }
     
 end:
@@ -500,16 +495,11 @@ ngx_int_t ngx_http_kafka_init_worker(ngx_cycle_t *cycle)
 void ngx_http_kafka_exit_worker(ngx_cycle_t *cycle)
 {
     ngx_http_kafka_main_conf_t  *main_conf;
-    
+
     
     main_conf = ngx_http_cycle_get_module_main_conf(cycle, ngx_http_kafka_module);
     
-    while (rd_kafka_outq_len(main_conf->rk) > 0)   //https://github.com/edenhill/librdkafka/wiki/Proper-termination-sequence
-        rd_kafka_poll(main_conf->rk, 50);
-    
     rd_kafka_destroy(main_conf->rk);
-    rd_kafka_wait_destroyed(50);
-    
     redisFree(main_conf->redis_ctx);
 }
 

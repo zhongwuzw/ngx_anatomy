@@ -181,6 +181,7 @@
 		014D571A1A7A25CB001C435A /* rfork_thread.S in Sources */ = {isa = PBXBuildFile; fileRef = 014D56701A7A25CA001C435A /* rfork_thread.S */; };
 		014D571C1A7A3BE4001C435A /* ngx_http_mytest_module_upstream.c in Sources */ = {isa = PBXBuildFile; fileRef = 014D571B1A7A3BE4001C435A /* ngx_http_mytest_module_upstream.c */; };
 		014D57211A7B6785001C435A /* ngx_http_mytest_module.c in Sources */ = {isa = PBXBuildFile; fileRef = 014D57201A7B6785001C435A /* ngx_http_mytest_module.c */; };
+		0E1AE2491CA1300A00BFF8A7 /* ss.c in Sources */ = {isa = PBXBuildFile; fileRef = 0E1AE2481CA1300A00BFF8A7 /* ss.c */; };
 		0E5C076E1C901433002470A6 /* ngx_kafka_module.c in Sources */ = {isa = PBXBuildFile; fileRef = 0E5C076D1C901433002470A6 /* ngx_kafka_module.c */; };
 /* End PBXBuildFile section */
 
@@ -470,6 +471,7 @@
 		014D56701A7A25CA001C435A /* rfork_thread.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = rfork_thread.S; sourceTree = "<group>"; };
 		014D571B1A7A3BE4001C435A /* ngx_http_mytest_module_upstream.c */ = {isa = PBXFileReference; fileEncoding = 2147483673; lastKnownFileType = sourcecode.c.c; path = ngx_http_mytest_module_upstream.c; sourceTree = "<group>"; };
 		014D57201A7B6785001C435A /* ngx_http_mytest_module.c */ = {isa = PBXFileReference; fileEncoding = 2147483673; lastKnownFileType = sourcecode.c.c; path = ngx_http_mytest_module.c; sourceTree = "<group>"; };
+		0E1AE2481CA1300A00BFF8A7 /* ss.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ss.c; sourceTree = "<group>"; };
 		0E5C076D1C901433002470A6 /* ngx_kafka_module.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ngx_kafka_module.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -487,6 +489,7 @@
 		010447931A71F79D0082D6F7 = {
 			isa = PBXGroup;
 			children = (
+				0E1AE2481CA1300A00BFF8A7 /* ss.c */,
 				0104479E1A71F79E0082D6F7 /* ngx_anatomy */,
 				0104479D1A71F79E0082D6F7 /* Products */,
 			);
@@ -976,6 +979,7 @@
 				014D57121A7A25CB001C435A /* ngx_shmem.c in Sources */,
 				014D56FE1A7A25CB001C435A /* ngx_darwin_init.c in Sources */,
 				014D56A31A7A25CB001C435A /* ngx_http_access_module.c in Sources */,
+				0E1AE2491CA1300A00BFF8A7 /* ss.c in Sources */,
 				014D57141A7A25CB001C435A /* ngx_solaris_init.c in Sources */,
 				014D570D1A7A25CB001C435A /* ngx_readv_chain.c in Sources */,
 				014D56C21A7A25CB001C435A /* ngx_http_realip_module.c in Sources */,
