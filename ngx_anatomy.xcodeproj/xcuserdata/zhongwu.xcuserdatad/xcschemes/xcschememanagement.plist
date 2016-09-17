@@ -4,6 +4,11 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
+		<key>ngix.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>1</integer>
+		</dict>
 		<key>ngx_anatomy.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
@@ -13,6 +18,11 @@
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
 		<key>0104479B1A71F79E0082D6F7</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>0EC6B2D51D8D8AFF004E0FC5</key>
 		<dict>
 			<key>primary</key>
 			<true/>
