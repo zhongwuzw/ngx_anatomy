@@ -15,7 +15,7 @@
 
 typedef struct {
     size_t      len;
-    u_char     *data;
+    u_char     *data;   //data指向的并不一定是普通的字符串，既以`\0`为结尾，所以需要len成员来进行长度的声明
 } ngx_str_t;
 
 

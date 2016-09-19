@@ -125,8 +125,10 @@ ngx_master_process_cycle(ngx_cycle_t *cycle)
     ngx_setproctitle(title);
 
 
+    //core模块的配置数据结构
     ccf = (ngx_core_conf_t *) ngx_get_conf(cycle->conf_ctx, ngx_core_module);
 
+    //生成worker进程
     ngx_start_worker_processes(cycle, ccf->worker_processes,
                                NGX_PROCESS_RESPAWN);
     ngx_start_cache_manager_processes(cycle, 0);
@@ -723,6 +725,8 @@ ngx_master_process_exit(ngx_cycle_t *cycle)
 }
 
 
+
+//worker进程处理主函数
 static void
 ngx_worker_process_cycle(ngx_cycle_t *cycle, void *data)
 {
