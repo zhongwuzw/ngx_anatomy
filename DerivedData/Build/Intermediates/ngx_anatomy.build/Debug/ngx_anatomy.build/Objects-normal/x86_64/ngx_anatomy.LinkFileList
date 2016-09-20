@@ -17,6 +17,7 @@
 /Users/zhongwu/Documents/workspace/ngx_anatomy/DerivedData/Build/Intermediates/ngx_anatomy.build/Debug/ngx_anatomy.build/Objects-normal/x86_64/ngx_event_openssl.o
 /Users/zhongwu/Documents/workspace/ngx_anatomy/DerivedData/Build/Intermediates/ngx_anatomy.build/Debug/ngx_anatomy.build/Objects-normal/x86_64/ngx_http_v2_huff_decode.o
 /Users/zhongwu/Documents/workspace/ngx_anatomy/DerivedData/Build/Intermediates/ngx_anatomy.build/Debug/ngx_anatomy.build/Objects-normal/x86_64/ngx_regex.o
+/Users/zhongwu/Documents/workspace/ngx_anatomy/DerivedData/Build/Intermediates/ngx_anatomy.build/Debug/ngx_anatomy.build/Objects-normal/x86_64/ngx_http_kafka_module.o
 /Users/zhongwu/Documents/workspace/ngx_anatomy/DerivedData/Build/Intermediates/ngx_anatomy.build/Debug/ngx_anatomy.build/Objects-normal/x86_64/ngx_mail_pop3_module.o
 /Users/zhongwu/Documents/workspace/ngx_anatomy/DerivedData/Build/Intermediates/ngx_anatomy.build/Debug/ngx_anatomy.build/Objects-normal/x86_64/ngx_mail_ssl_module.o
 /Users/zhongwu/Documents/workspace/ngx_anatomy/DerivedData/Build/Intermediates/ngx_anatomy.build/Debug/ngx_anatomy.build/Objects-normal/x86_64/ngx_stream_upstream_least_conn_module.o

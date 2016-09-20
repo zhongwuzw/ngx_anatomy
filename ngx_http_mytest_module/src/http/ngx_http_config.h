@@ -15,14 +15,17 @@
 
 
 typedef struct {
+    //指针数组，数组中的每个元素指向所有HTTP模块create_main_conf方法产生的结构体
     void        **main_conf;
     void        **srv_conf;
     void        **loc_conf;
-} ngx_http_conf_ctx_t;
+} ngx_http_conf_ctx_t; //只要遇到http{}、server{}、location{}块，都会创建一个这样的结构
 
-
+//HTTP框架在启动过程中会在每个阶段调用该结构体中相应的方法
 typedef struct {
+    //解析配置文件前调用
     ngx_int_t   (*preconfiguration)(ngx_conf_t *cf);
+    //完成配置文件的解析后调用
     ngx_int_t   (*postconfiguration)(ngx_conf_t *cf);
 
     void       *(*create_main_conf)(ngx_conf_t *cf);

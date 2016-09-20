@@ -117,7 +117,9 @@ typedef struct {
 } ngx_http_listen_opt_t;
 
 
+//HTTP的11个阶段
 typedef enum {
+    //在接收到完整的HTTP头部后处理的HTTP阶段
     NGX_HTTP_POST_READ_PHASE = 0,
 
     NGX_HTTP_SERVER_REWRITE_PHASE,
@@ -132,6 +134,7 @@ typedef enum {
     NGX_HTTP_POST_ACCESS_PHASE,
 
     NGX_HTTP_TRY_FILES_PHASE,
+    //用于处理HTTP请求内容的阶段
     NGX_HTTP_CONTENT_PHASE,
 
     NGX_HTTP_LOG_PHASE

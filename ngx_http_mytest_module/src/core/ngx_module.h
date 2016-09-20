@@ -245,7 +245,7 @@
 
 struct ngx_module_s {
     ngx_uint_t            ctx_index;
-    ngx_uint_t            index;
+    ngx_uint_t            index;    //index表示当前模块在ngx_modules数组中的序号，ctx_index表示的是当前模块在一类模块中的序号，而index表示当前模块在所有模块中的序号。
 
     char                 *name;
 

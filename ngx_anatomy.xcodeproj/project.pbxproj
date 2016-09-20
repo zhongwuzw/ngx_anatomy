@@ -10,6 +10,7 @@
 		010447A01A71F79E0082D6F7 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0104479F1A71F79E0082D6F7 /* main.cpp */; };
 		014D571C1A7A3BE4001C435A /* ngx_http_mytest_module_upstream.c in Sources */ = {isa = PBXBuildFile; fileRef = 014D571B1A7A3BE4001C435A /* ngx_http_mytest_module_upstream.c */; };
 		014D57211A7B6785001C435A /* ngx_http_mytest_module.c in Sources */ = {isa = PBXBuildFile; fileRef = 014D57201A7B6785001C435A /* ngx_http_mytest_module.c */; };
+		0E1028A41D910F1A00A75172 /* ngx_http_kafka_module.c in Sources */ = {isa = PBXBuildFile; fileRef = 0E1028A31D910F1A00A75172 /* ngx_http_kafka_module.c */; };
 		0EC6AE771D8D7EF2004E0FC5 /* ngx_modules.c in Sources */ = {isa = PBXBuildFile; fileRef = 0EC6AE761D8D7EF2004E0FC5 /* ngx_modules.c */; };
 		0EC6B21B1D8D880E004E0FC5 /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = 0EC6B0E81D8D880D004E0FC5 /* Makefile */; };
 		0EC6B21C1D8D880E004E0FC5 /* nginx.c in Sources */ = {isa = PBXBuildFile; fileRef = 0EC6B0EE1D8D880D004E0FC5 /* nginx.c */; };
@@ -215,6 +216,7 @@
 		0104479F1A71F79E0082D6F7 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		014D571B1A7A3BE4001C435A /* ngx_http_mytest_module_upstream.c */ = {isa = PBXFileReference; fileEncoding = 2147483673; lastKnownFileType = sourcecode.c.c; path = ngx_http_mytest_module_upstream.c; sourceTree = "<group>"; };
 		014D57201A7B6785001C435A /* ngx_http_mytest_module.c */ = {isa = PBXFileReference; fileEncoding = 2147483673; lastKnownFileType = sourcecode.c.c; path = ngx_http_mytest_module.c; sourceTree = "<group>"; };
+		0E1028A31D910F1A00A75172 /* ngx_http_kafka_module.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ngx_http_kafka_module.c; sourceTree = "<group>"; };
 		0EC6AE741D8D7EF2004E0FC5 /* ngx_auto_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ngx_auto_config.h; sourceTree = "<group>"; };
 		0EC6AE751D8D7EF2004E0FC5 /* ngx_auto_headers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ngx_auto_headers.h; sourceTree = "<group>"; };
 		0EC6AE761D8D7EF2004E0FC5 /* ngx_modules.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ngx_modules.c; sourceTree = "<group>"; };
@@ -652,6 +654,7 @@
 				0EC6B0EC1D8D880D004E0FC5 /* src */,
 				0104479F1A71F79E0082D6F7 /* main.cpp */,
 				014D57201A7B6785001C435A /* ngx_http_mytest_module.c */,
+				0E1028A31D910F1A00A75172 /* ngx_http_kafka_module.c */,
 				014D571B1A7A3BE4001C435A /* ngx_http_mytest_module_upstream.c */,
 				0EC6AE741D8D7EF2004E0FC5 /* ngx_auto_config.h */,
 				0EC6AE751D8D7EF2004E0FC5 /* ngx_auto_headers.h */,
@@ -1440,6 +1443,7 @@
 				0EC6B24A1D8D880E004E0FC5 /* ngx_event_openssl.c in Sources */,
 				0EC6B2941D8D880E004E0FC5 /* ngx_http_v2_huff_decode.c in Sources */,
 				0EC6B2361D8D880E004E0FC5 /* ngx_regex.c in Sources */,
+				0E1028A41D910F1A00A75172 /* ngx_http_kafka_module.c in Sources */,
 				0EC6B2A01D8D880E004E0FC5 /* ngx_mail_pop3_module.c in Sources */,
 				0EC6B2A41D8D880E004E0FC5 /* ngx_mail_ssl_module.c in Sources */,
 				0EC6B2D11D8D880E004E0FC5 /* ngx_stream_upstream_least_conn_module.c in Sources */,
@@ -1771,6 +1775,7 @@
 				0EC6B2D81D8D8AFF004E0FC5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

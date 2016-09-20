@@ -16,8 +16,8 @@
 typedef struct ngx_list_part_s  ngx_list_part_t;
 
 struct ngx_list_part_s {
-    void             *elts;
-    ngx_uint_t        nelts;
+    void             *elts; //数组
+    ngx_uint_t        nelts;   // 当前实际占的容量
     ngx_list_part_t  *next;
 };
 
@@ -25,8 +25,8 @@ struct ngx_list_part_s {
 typedef struct {
     ngx_list_part_t  *last;
     ngx_list_part_t   part;
-    size_t            size;
-    ngx_uint_t        nalloc;
+    size_t            size; //ngx_list_part_t数组每个元素的大小
+    ngx_uint_t        nalloc;   //ngx_list_part_t数组分配的容量个数
     ngx_pool_t       *pool;
 } ngx_list_t;
 
@@ -76,7 +76,7 @@ ngx_list_init(ngx_list_t *list, ngx_pool_t *pool, ngx_uint_t n, size_t size)
  *  }
  */
 
-
+//向链表添加元素时调用，返回存储元素的指针，向该指针赋值新元素即可
 void *ngx_list_push(ngx_list_t *list);
 
 
