@@ -455,13 +455,17 @@ void ngx_http_kafka_exit_worker(ngx_cycle_t *cycle)
     
     main_conf = ngx_http_cycle_get_module_main_conf(cycle, ngx_http_kafka_module);
     
-    while (rd_kafka_outq_len(main_conf->rk) > 0)   //https://github.com/edenhill/librdkafka/wiki/Proper-termination-sequence
-        rd_kafka_poll(main_conf->rk, 50);
-    
-    rd_kafka_destroy(main_conf->rk);
-    rd_kafka_wait_destroyed(50);
-    
-    redisFree(main_conf->redis_ctx);
+    if (main_conf->rk) {
+        while (rd_kafka_outq_len(main_conf->rk) > 0)   //https://github.com/edenhill/librdkafka/wiki/Proper-termination-sequence
+            rd_kafka_poll(main_conf->rk, 50);
+        
+        rd_kafka_destroy(main_conf->rk);
+        rd_kafka_wait_destroyed(50);
+    }
+
+    if (main_conf->redis_ctx) {
+        redisFree(main_conf->redis_ctx);
+    }
 }
 
 void ngx_str_helper(ngx_str_t *str, ngx_str_op op)

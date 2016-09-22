@@ -16,7 +16,7 @@
 typedef struct ngx_listening_s  ngx_listening_t;
 
 struct ngx_listening_s {
-    ngx_socket_t        fd;
+    ngx_socket_t        fd; //socket套接字句柄
 
     struct sockaddr    *sockaddr;
     socklen_t           socklen;    /* size of sockaddr */
@@ -25,9 +25,9 @@ struct ngx_listening_s {
 
     int                 type;
 
-    int                 backlog;
-    int                 rcvbuf;
-    int                 sndbuf;
+    int                 backlog;    //TCP实现监听时的backlog队列，它表示允许正在通过三次握手建立TCP连接但还没有任何进程开始处理的连接最大个数
+    int                 rcvbuf; //内核中对于这个套接字的接收缓存区大小
+    int                 sndbuf; //内核中对于这个套接字的发送缓存区大小
 #if (NGX_HAVE_KEEPALIVE_TUNABLE)
     int                 keepidle;
     int                 keepintvl;
@@ -123,8 +123,8 @@ typedef enum {
 
 struct ngx_connection_s {
     void               *data;
-    ngx_event_t        *read;
-    ngx_event_t        *write;
+    ngx_event_t        *read;   //连接对应的读事件
+    ngx_event_t        *write;  //连接对应的写事件
 
     ngx_socket_t        fd;
 

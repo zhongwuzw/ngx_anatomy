@@ -115,7 +115,7 @@ ngx_module_t  ngx_http_module = {
     NGX_MODULE_V1_PADDING
 };
 
-
+//当解析配置文件时遇到http关键字时调用
 static char *
 ngx_http_block(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
@@ -792,7 +792,7 @@ ngx_http_init_locations(ngx_conf_t *cf, ngx_http_core_srv_conf_t *cscf,
     return NGX_OK;
 }
 
-
+//构建静态location查找树
 static ngx_int_t
 ngx_http_init_static_location_trees(ngx_conf_t *cf,
     ngx_http_core_loc_conf_t *pclcf)
@@ -825,7 +825,8 @@ ngx_http_init_static_location_trees(ngx_conf_t *cf,
     }
 
     if (ngx_http_join_exact_locations(cf, locations) != NGX_OK) {
-        return NGX_ERROR;
+        return NGX_ERR
+        OR;
     }
 
     ngx_http_create_locations_list(locations, ngx_queue_head(locations));
